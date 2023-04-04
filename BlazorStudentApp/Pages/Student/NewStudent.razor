@@ -1,0 +1,71 @@
+﻿@page "/new"
+@using BlazorStudentApp.Data.Models
+@using BlazorStudentApp.Data.Services
+@using Microsoft.AspNetCore.Components.Forms
+@inject IStudentsService StudentsService
+
+<PageTitle>Add new student</PageTitle>
+
+<h1>Add new student</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-8 offset-2" style="display:@(isSuccessMessageVisible ? "block" : "none")">
+        <div class="alert alert-success" role="alert">
+            Student @studentName added to the database. Fill in the form to add another student.
+        </div>
+    </div>
+    <div class="col-md-8 offset-2">
+        <EditForm Model="student" OnValidSubmit="@HandleSubmit">
+            <DataAnnotationsValidator />
+
+            <div class="form-group">
+                <label for="name">Full name</label>
+                <input type="text" class="form-control" id="name" @bind-value="student.Name" placeholder="Enter your full name">
+                <ValidationMessage For="() => student.Name" />
+            </div>
+            <div class="form-group">
+                <label for="email">Email address</label>
+                <input type="email" class="form-control" id="email" @bind-value="student.Email" placeholder="Enter email">
+                <ValidationMessage For="() => student.Email" />
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone</label>
+                <input type="text" class="form-control" id="phone" @bind-value="student.Phone" placeholder="Enter your phone number">
+                <ValidationMessage For="() => student.Phone" />
+            </div>
+            <div class="form-group">
+                <label for="address">Address</label>
+                <input type="text" class="form-control" id="address" @bind-value="student.Address" placeholder="Enter your address">
+                <ValidationMessage For="() => student.Address" />
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private Student student = new();
+    private string studentName = "";
+    private bool isSuccessMessageVisible = false;
+
+    private async Task HandleSubmit()
+    {
+        try
+        {
+            studentName = student.Name;
+            await StudentsService.AddStudentAsync(student);
+            isSuccessMessageVisible = true;
+            ResetForm();
+        }
+        catch
+        {
+
+        }
+    }
+
+    void ResetForm()
+    {
+        student = new();
+    }
+}

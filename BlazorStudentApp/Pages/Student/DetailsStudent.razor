@@ -1,0 +1,55 @@
+﻿@page "/details/{Id:int}"
+@using BlazorStudentApp.Data.Models
+@using BlazorStudentApp.Data.Services
+@using Microsoft.AspNetCore.Components.Forms
+@inject NavigationManager _navManager
+
+<PageTitle>Details of the student</PageTitle>
+
+<div class="modal fade show" id="myModal" style="display:block" aria-modal="true" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">@Heading</h4>
+                <button type="button" class="close" @onclick="@CloseDetails">&times;</button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <h5 class="card-title">@SelectedStudent.Name</h5>
+                <h6 class="card-subtitle mb-2 text-muted">@SelectedStudent.Email</h6>
+                <p class="card-text">@SelectedStudent.Address</p>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" @onclick=@CloseDetails>Close</button>
+            </div>
+            @*<Footer></Footer>*@
+        </div>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public Student SelectedStudent { get; set; }
+    
+    [Parameter]
+    public string Heading { get; set; }
+    
+
+    protected override async Task OnInitializedAsync()
+    {
+    }
+
+    [Parameter]
+    public EventCallback onCloseDetailsButtonClicked { get; set; }
+
+    protected async Task CloseDetails()
+    {
+        await onCloseDetailsButtonClicked.InvokeAsync();
+    }
+}

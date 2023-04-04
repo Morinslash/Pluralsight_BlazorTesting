@@ -1,0 +1,106 @@
+﻿@page "/list"
+@using BlazorStudentApp.Data.Services;
+@using BlazorStudentApp.Data.Models;
+@inject IStudentsService StudentsService
+@inject IJSRuntime JsRuntime
+@inject NavigationManager _navManager
+
+<PageTitle>Students</PageTitle>
+
+<h1>List of students</h1>
+
+<p>Below is the list of all students.</p>
+
+@if (students == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email (C)</th>
+                <th>Phone (F)</th>
+                <th>Address</th>
+                <th>Operations</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var student in students)
+            {
+                <tr>
+                    <td>@student.Name</td>
+                    <td>@student.Email</td>
+                    <td>@student.Phone</td>
+                    <td>@student.Address</td>
+                    <td>
+                        <button class="btn btn-default" @onclick="() => EditStudentConfirmationRedirect(student)"><i class="bi bi-pencil-square"></i></button>
+                        <button class="btn btn-danger" @onclick="() => DeleteStudentConfirmation(student)"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (showModal)
+    {
+        <div class="modal fade show" id="myModal" style="display:block" aria-modal="true" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title">Confirm</h4>
+                        <button type="button" class="close" @onclick="@CancelDelete">&times;</button>
+                    </div>
+
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <p>You are about to delete @selectedStudent.Name. Are you sure?</p>
+                    </div>
+
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn" @onclick="@CancelDelete">Cancel</button>
+                        <button type="button" class="btn btn-danger" @onclick=@ConfirmDelete>Delete</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    }
+
+}
+@code {
+    public List<Student> students;
+    private Student selectedStudent;
+    bool showModal = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        students = await StudentsService.GetStudentsAsync();
+    }
+
+    protected void DeleteStudentConfirmation(Student student)
+    {
+        selectedStudent = student;
+        showModal = true;
+    }
+
+    protected void EditStudentConfirmationRedirect(Student student)
+    {
+        _navManager.NavigateTo("/edit/"+student.Id, true);
+    }
+
+
+
+    void CancelDelete() => showModal = false;
+    async Task ConfirmDelete()
+    {
+        await StudentsService.DeleteStudentAsync(selectedStudent.Id);
+        students = await StudentsService.GetStudentsAsync();
+        showModal = false;
+    }
+}
