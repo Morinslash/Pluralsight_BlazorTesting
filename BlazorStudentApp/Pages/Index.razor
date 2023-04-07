@@ -1,4 +1,17 @@
 ﻿@page "/"
 <PageTitle>Welcome</PageTitle>
 <h1>Welcome to our school</h1>
+<h6>@subTitle</h6>
 <p>This is the official page to manage students of our School.</p>
+
+@code
+{
+    public string subTitle = string.Empty;
+    [Parameter]
+    public Task<string> TextService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        subTitle = await TextService;
+    }
+}
