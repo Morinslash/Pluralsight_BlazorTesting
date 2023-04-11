@@ -1,17 +1,31 @@
 ﻿@page "/"
+
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
 <PageTitle>Welcome</PageTitle>
-<h1>Welcome to our school</h1>
+@if (isAuthenticated)
+{
+    <h1>Welcome to our school</h1> 
+}
+@if (!isAuthenticated)
+{
+    <h1>Please log in!</h1>
+}
 <h6>@subTitle</h6>
 <p>This is the official page to manage students of our School.</p>
 
 @code
 {
+    public bool isAuthenticated = false;
     public string subTitle = string.Empty;
     [Parameter]
     public Task<string> TextService { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        subTitle = await TextService;
+        var state = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        isAuthenticated = state.User.Identity.IsAuthenticated;
+        // subTitle = await TextService;
     }
 }
